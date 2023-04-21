@@ -71,8 +71,8 @@ async def fetchAddresses(soup: BeautifulSoup):
 async def main():
 
     ##################
-    keyword = "建設業"
-    area = "兵庫県"
+    keyword = "旅館"
+    area = "兵庫県豊岡市"
     dataSize = 50  # dataSize * 20 === 50 * 20 => 1000
     ###################
 
@@ -89,7 +89,7 @@ async def main():
     try:
         index = 0
         # 一回で20件取得 20 * 50 = 1000件
-        while index < dataSize:
+        while driver.find_element(By.CLASS_NAME, 'm-read-more') or index < dataSize:
             button = driver.find_element(By.CLASS_NAME, 'm-read-more')
             button.click()
             time.sleep(1)
@@ -103,8 +103,12 @@ async def main():
     titles = await fetchTitles(soup)
     numbers = await fetchPhoneNumbers(soup)
     addersses = await fetchAddresses(soup)
-    df = pd.DataFrame({"会社名": titles, "電話番号": numbers, "住所": addersses})
-    df.to_csv(f'{keyword}_{area}_{dataSize * 20}件.csv', index=False)
+    df = pd.DataFrame({
+        "会社名": titles,
+        "電話番号": numbers,
+        "住所": addersses
+    })
+    df.to_csv(f'{keyword}_{area}_{len(titles)}件.csv', index=False)
 
 
 asyncio.run(main())
